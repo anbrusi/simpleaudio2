@@ -6,6 +6,8 @@ import { Essentials } from '@ckeditor/ckeditor5-essentials';
 import { Heading } from '@ckeditor/ckeditor5-heading';
 import { List } from '@ckeditor/ckeditor5-list';
 import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
+import { SimpleUploadAdapter } from '@ckeditor/ckeditor5-upload';
+import SimpleAudio from '../src/simpleaudio';
 
 
 export default class ClassicEditor extends ClassicEditorBase {}
@@ -16,7 +18,9 @@ ClassicEditor.builtinPlugins = [
     Italic,
     Heading,
     List,
-    Paragraph
+    Paragraph,
+    SimpleUploadAdapter,
+    SimpleAudio
 ];
 
 ClassicEditor.defaultConfig = {
@@ -28,8 +32,13 @@ ClassicEditor.defaultConfig = {
             'italic',
             '|',
             'bulletedList',
-            'numberedList'
+            'numberedList',
+            '|',
+            'simpleAudio'
         ]
     },
+    simpleUpload: {
+		uploadUrl: './isUpload.php'
+	},
     language: 'en'
 };

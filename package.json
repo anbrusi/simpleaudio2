@@ -1,5 +1,5 @@
 {
-  "dependencies": {
+  "devDependencies": {
     "@ckeditor/ckeditor5-basic-styles": "^39.0.2",
     "@ckeditor/ckeditor5-dev-utils": "^39.1.0",
     "@ckeditor/ckeditor5-editor-classic": "^39.0.2",

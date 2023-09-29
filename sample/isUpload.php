@@ -1,7 +1,19 @@
 <?php
+
+/**
+ * @abstract
+ * 
+ * Images and audios use the same simpleUploadAdapter, which can be configured only once. Therefore a common solution is adopted.
+ * The destination is chosen from the mime type and is either
+ * PARENT_DIRECTORY/IMAGE_DIRECTORY/original file name or
+ * PARENT_DIRECTORY/AUDIO_DIRECTORY/original file name
+ */
+
 class ImageUpload {
     const MAX_IMAGE_SIZE = 20;
-    const PARENT_DIRECTORY = '../'; // This is the relative path to the directories appImages and appAudios
+    const PARENT_DIRECTORY = './'; // This is the common relative path to the directories for images and audios
+    const AUDIO_DIRECTORY = 'appAudios/'; // The final destination for audios will be self::PARENT_DIRECTORY.self::AUDIO_DIRECTORY
+    const IMAGE_DIRECTORY = 'appImages/'; // The final destination for audios will be self::PARENT_DIRECTORY.self::IMAGE_DIRECTORY
     /**
      * Returns an error message $message to ckEditor as a json, which obeys the prescribed protocol
      * 
@@ -43,20 +55,19 @@ class ImageUpload {
      * 
      * @return array 
      */
-    private function storeImage(string $path):array {
+    private function storeFile(string $path):array {
         $stored = array('error' => '', 'filename' => '');
         $fileName = pathinfo($_FILES['upload']['name'],PATHINFO_BASENAME);
-        $to = self::PARENT_DIRECTORY.substr($path,3).$fileName;
+        $to = $path.$fileName;
         $ok = move_uploaded_file($_FILES['upload']['tmp_name'], $to);
         if ($ok) {
-            $stored['filename'] = $fileName;
+            $stored['filename'] = $to;
         } else {
             $stored['error'] = 'The file could not be uploaded';
         }
         return $stored;
     }
-    public function store() {
-        
+    public function store() {        
         try {
             $mimeType = mime_content_type($_FILES['upload']['tmp_name']);
         } catch (Throwable $ex) {
@@ -67,18 +78,19 @@ class ImageUpload {
             $this->error('Cannot detect mime type of file');
         }
         $this->validate($parts[0], $parts[1]); // Terminates on error with $this->error
+        $path = self::PARENT_DIRECTORY;
         if ($parts[0] == 'image') {
-            $path = '../appImages/';
+            $path .= self::IMAGE_DIRECTORY;
         } elseif ($parts[0] == 'audio') {
-            $path = '../appAudios/';
+            $path .= self::AUDIO_DIRECTORY;
         } else {
             $this->error('Unsupported mime type');
         }
-        $stored = $this->storeImage($path);
+        $stored = $this->storeFile($path);
         if ($stored['error'] != '') {
             $this->error($stored['error']);
         } else {
-            $url = $path.$stored['filename'];
+            $url = $stored['filename'];
             $response = array('url' => $url);
             $json = json_encode($response);
             echo $json;
