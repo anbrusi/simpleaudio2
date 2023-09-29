@@ -67,8 +67,12 @@ export default class AudioUI extends Plugin {
 		model.change( writer => {
 			const audio = writer.createElement( 'simpleaudio', { source: uploadResult.url, controls: '' } );
 
-			// console.log( 'audio', audio );
-			model.insertContent( audio );
+			// Locally this delay was not necessary, but on Cyon it solved the problem, that audios run only after a reload
+			// The delay of 1 sec is emirical, but 0.5 sec was not sufficient
+			// Probably it would be better to probe if the mp3 file is available
+			// loader.upload is a promise and we get to createAudio only after php stored the file,
+			// but apparently it is not yet available as soon as it has been successfully stored
+			setTimeout( () => model.insertContent( audio ), 1000);
 		} );
 	}
 }
